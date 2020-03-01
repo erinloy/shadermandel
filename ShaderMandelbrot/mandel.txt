@@ -1,0 +1,51 @@
+float maxIter : register(c0);
+float2 power : register(c1);
+float bailout : register(c2);
+float2 offset : register(c3);
+float2 size : register(c4);
+
+#include "complex.txt"
+
+float4 getColor(float i)
+{
+    float k = 1.0 / 3.0;
+    float k2 = 2.0 / 3.0;
+    float cr = 0.0;
+    float cg = 0.0;
+    float cb = 0.0;
+    if (i >= k2)
+    {
+        cr = i - k2;
+        cg = (k-1) - cr;
+    }
+    else if (i >= k)
+    {
+        cg = i - k;
+        cb = (k-1) - cg;
+    }
+    else
+    {
+        cb = i;
+    }
+    return float4(cr * 3, cg * 3, cb * 3, 1.0);
+}
+
+float4 main(float2 uv : TEXCOORD) : COLOR
+{
+	float2 xy = float2(uv.x / size.x + offset.x, uv.y / size.y + offset.y);
+	float2 z = float2(xy.x, xy.y);
+	float i = 0;
+
+	while (i < maxIter && c_abs(z) <= bailout)
+	{
+		z = c_add(c_pow(z, power), xy);
+		i++;
+	}
+	if (i < maxIter)
+	{
+		i -= log(log(c_abs(z))) / log(c_abs(power));
+		return getColor(i / maxIter);
+	}
+	else
+		return float4(0.0, 0.0, 0.0, 1.0);
+}

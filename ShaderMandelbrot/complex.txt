@@ -1,0 +1,69 @@
+static const float pi = 3.14159265;
+static const float e = 2.71828183;
+
+float2 c_add(float2 c1, float2 c2)
+{
+	float a = c1.x;
+	float b = c1.y;
+	float c = c2.x;
+	float d = c2.y;
+	return float2(a + c, b + d);
+}
+float2 c_sub(float2 c1, float2 c2)
+{
+	float a = c1.x;
+	float b = c1.y;
+	float c = c2.x;
+	float d = c2.y;
+	return float2(a - c, b - d);
+}
+float2 c_mul(float2 c1, float2 c2)
+{
+	float a = c1.x;
+	float b = c1.y;
+	float c = c2.x;
+	float d = c2.y;
+	return float2(a*c - b*d, b*c + a*d);
+}
+float2 c_div(float2 c1, float2 c2)
+{
+	float a = c1.x;
+	float b = c1.y;
+	float c = c2.x;
+	float d = c2.y;
+	float real = (a*c + b*d) / (c*c + d*d);
+	float imag = (b*c - a*d) / (c*c + d*d);
+	return float2(real, imag);
+}
+float c_abs(float2 c)
+{
+	return sqrt(c.x*c.x + c.y*c.y);
+}
+float2 c_pol(float2 c)
+{
+	float a = c.x;
+	float b = c.y;
+	float z = c_abs(c);
+	float f = atan2(b, a);
+	return float2(z, f);
+}
+float2 c_rec(float2 c)
+{
+	float z = abs(c.x);
+	float f = c.y;
+	float a = z * cos(f);
+	float b = z * sin(f);
+	return float2(a, b);
+}
+float2 c_pow(float2 base, float2 exp)
+{
+	float2 b = c_pol(base);
+	float r = b.x;
+	float f = b.y;
+	float c = exp.x;
+	float d = exp.y;
+	float z = pow(r, c) * pow(e, -d * f);
+	float fi = d * log(r) + c * f;
+	float2 rpol = float2(z, fi);
+	return c_rec(rpol);
+}
